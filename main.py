@@ -1,27 +1,36 @@
-"""One Line, One Chill entry writer (v1, writer session).
+"""One-line horror entry for the One Line, One Chill bounty.
 
-Writes the exact one-sentence horror entry to /output/entry.txt
-(no trailing newline), with guards for sentence count and length.
+The program emits a single sentence of horror to /output/entry.txt.
+Nothing else is written, and the sentence is checked before it is saved.
 """
 
-from pathlib import Path
+import os
 
-ENTRY = (
-    "I called my own number from the hotel phone, and a man who sounded "
-    "exactly like me picked up and told me never to come home."
-)
 
-MAX_CHARS = 200
+SENTENCE = "The elevator opened on my floor and my own shoes were already waiting inside it, still warm."
+
+
+def sentence_is_single(text):
+    stripped = text.strip()
+    if not stripped:
+        return False
+    if stripped.count(".") != 1:
+        return False
+    if not stripped.endswith("."):
+        return False
+    if not 1 <= len(stripped) <= 200:
+        return False
+    size = len(stripped.encode("utf-8"))
+    return 86 <= size <= 144
 
 
 def main():
-    if ENTRY.count(".") != 1:
-        raise ValueError("entry must be exactly 1 sentence")
-    if not 1 <= len(ENTRY) <= MAX_CHARS:
-        raise ValueError("entry must be 1-200 characters")
-    out = Path("/output/entry.txt")
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(ENTRY, encoding="utf-8", newline="")
+    line = SENTENCE
+    if not sentence_is_single(line):
+        raise SystemExit("entry failed the one-sentence check")
+    os.makedirs("/output", exist_ok=True)
+    with open("/output/entry.txt", "w", encoding="utf-8") as handle:
+        handle.write(line)
 
 
 if __name__ == "__main__":
